@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--这种方式能够进行复杂的配置，能够满足需求-->
+<configuration>
+
+    <appender name="consoleLog" class="ch.qos.logback.core.ConsoleAppender">
+       <!--关于展示的配置-->
+        <layout class="ch.qos.logback.classic.PatternLayout">
+           <!--具体的格式-->
+            <pattern>
+                %d - %msg%n
+            </pattern>
+        </layout>
+    </appender>
+
+    <!--RollingFileAppender：因为要对日志每天输出一个文件，所以是一个滚动的文件输出-->
+    <appender name="fileInfoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--进行过滤，根据范围来过滤，这里不能只通过把level配置成INFO来进行过滤，还会打印出ERROR-->
+        <!--因为日志的级别，如果配置的级别是INFO，会打印出INFO以及更高的级别-->
+        <!--LevelFilter：定义了三种操作：禁止，中立，接受
+        public enum FilterReply {
+            DENY,NEUTRAL,ACCEPT;}
+
+            onMatch：如果匹配就禁止掉
+            onMismatch：反之就接受-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>
+                %msg%n
+            </pattern>
+        </encoder>
+        <!--滚动策略，按照时间来滚动-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--路径-->
+            <fileNamePattern>F://log/info.%d.log</fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
+
+    <appender name="fileErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!--ThresholdFilter：ERROR级别，只希望输出ERROR的日志-->
+            <level>ERROR</level>
+        </filter>
+        <encoder>
+            <pattern>
+                %msg%n
+            </pattern>
+        </encoder>
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--路径-->
+            <fileNamePattern>F://log/error.%d.log</fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
+    <!--应用上面的配置-->
+    <root level="info">
+        <appender-ref ref="consoleLog" />
+        <appender-ref ref="fileInfoLog" />
+        <appender-ref ref="fileErrorLog" />
+    </root>
+
+</configuration>
